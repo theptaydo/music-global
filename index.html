@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music Playlist</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f0f0f0;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .player {
+      margin-top: 50px;
+    }
+
+    .song-info {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    .controls {
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 0 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background-color: #ccc;
+    }
+
+    .playlist {
+      margin-top: 30px;
+    }
+
+    .playlist ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .playlist li {
+      padding: 10px;
+      background-color: #fff;
+      margin: 5px 0;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .playlist li:hover {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .playlist li.active {
+      background-color: #4CAF50;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Music Playlist</h1>
+
+  <div class="player">
+    <audio id="audioPlayer" controls>
+      <source id="audioSource" src="" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+
+    <div class="song-info">
+      <p id="currentSongTitle">Select a song from the playlist</p>
+    </div>
+
+    <div class="controls">
+      <button id="prevBtn" onclick="playPrevSong()">Prev</button>
+      <button id="nextBtn" onclick="playNextSong()">Next</button>
+    </div>
+  </div>
+
+  <div class="playlist">
+    <h2>Playlist</h2>
+    <ul id="songList">
+      <!-- Danh sách bài hát sẽ được thêm ở đây bằng JavaScript -->
+    </ul>
+  </div>
+
+  <script>
+    // Danh sách bài hát
+    const songs = [
+      { title: "Song 1", src: "./assets/audio/(FREE) Lo-fi Type Beat - I Need a Girl.mp3" },
+      { title: "Song 1", src: "./assets/audio/_An Coong Piano Cover_ Đã lỡ yêu em nhiều - JustaTee - Piano Tutorial.mp3" },
+      { title: "Song 1", src: "./assets/audio/Alec Benjamin - Let Me Down Slowly _ Piano Cover by Pianella Piano.mp3" },
+      { title: "Song 1", src: "./assets/audio/Always With Me - Spirited Away (Piano).mp3" },
+      { title: "Song 1", src: "./assets/audio/Beat Ghé Qua - Tofu Dick PC.mp3" },
+      { title: "Song 1", src: "./assets/audio/BINZ   HIT ME UP ft  NOMOVODKA Cover + Sheet Piano - Piano Tutorial.mp3" },
+      { title: "Song 1", src: "./assets/audio/buồn thì cứ khóc đi.mp3" },
+      { title: "Song 1", src: "./assets/audio/Bèo Dạt Mây Trôi - Anh Khang x Quang Thắng _ Piano Cover.mp3" },
+      { title: "Song 1", src: "./assets/audio/Chuyện Đôi Ta - Emcee L (Da LAB) ft Muộii _ Yuriko Piano Cover.mp3" },
+      { title: "Song 1", src: "./assets/audio/CHẠY NGAY ĐI _ RUN NOW _ SƠN TÙNG M-TP __ PIANO COVER #ANCOONG.mp3" },
+      { title: "Song 1", src: "./assets/audio/dhruv - double take _ Piano Cover with Strings (with Lyrics & PIANO SHEET).mp3" },
+      { title: "Song 1", src: "./assets/audio/Ed Sheeran - Shape of You (Piano Cover).mp3" },
+      { title: "Song 1", src: "./assets/audio/Ex's Hate Me part 2 - B Ray & AMEE - Piano Cover + Sheet Piano - Piano Tutorial.mp3" },
+      { title: "Song 1", src: "./assets/audio/HARU HARU(하루하루) Piano - BIGBANG _ Sheet Free.mp3" },
+      { title: "Song 1", src: "./assets/audio/HỒNG NHAN - JACK __ PIANO COVER __ BICH X LE.mp3" },
+      { title: "Song 1", src: "./assets/audio/Jeremy Zucker(제레미 주커) - comethru _ 4hands piano.mp3" },
+      { title: "Song 1", src: "./assets/audio/La La La__ Naughty Boy ft. Sam Smith (Piano Cover).mp3" },
+      { title: "Song 1", src: "./assets/audio/Lindsey Stirling - Senbonzakura (Kurousa Cover).mp3" },
+      { title: "Song 1", src: "./assets/audio/LẠC TRÔI - Sơn Tùng MTP _ Piano Cover Tutorial _ Sheet PDF _ Lê Trangg _.mp3" },
+      { title: "Song 1", src: "./assets/audio/Melanie Martinez - Play Date _ Piano Tutorial & Cover _ Piano Notes.mp3" },
+      { title: "Song 1", src: "./assets/audio/NƠI NÀY CÓ ANH - SƠN TÙNG M-TP __ PIANO COVER __ AN COONG PIANO.mp3" },
+      { title: "Song 1", src: "./assets/audio/Sorry, I Like You.mp3" },
+      { title: "Song 1", src: "./assets/audio/Sparkle - Your Name. (Kimi no Na wa.) OST [Piano] _ RADWIMPS.mp3" },
+      { title: "Song 1", src: "./assets/audio/Spirited Away (2001) - The Name of Life (Instrumental piano) Inochi No Namae いのちの名前.mp3" },
+      { title: "Song 1", src: "./assets/audio/SƠN TÙNG M TP HÃY TRAO CHO ANH ft Snoop Dogg Cover + Sheet Piano Piano Tutorial.mp3" },
+      { title: "Song 1", src: "./assets/audio/SƠN TÙNG M-TP _ CHÚNG TA CỦA HIỆN TẠI _ PIANO COVER  _ AN COONG.mp3" },
+      { title: "Song 1", src: "./assets/audio/Tại Vì Sao_ (Ballad Version) - RPT MCK (Piano).mp3" },
+      { title: "Song 1", src: "./assets/audio/Thiên Lý Ơi - Jack _ Piano Cover.mp3" },
+      { title: "Song 1", src: "./assets/audio/TÌNH ĐẦU QUÁ CHÉN _Anh Trai Say Hi_ _ Piano For Beginner.mp3" },
+      { title: "Song 1", src: "./assets/audio/Túy Âm - Xesi x Masew x Nhatnguyen _ Sheet Free.mp3" },
+      { title: "Song 1", src: "./assets/audio/vài câu nói có khiến người thay đổi (Grey D x tlinh) - Piano cover.mp3" },
+      { title: "Song 1", src: "./assets/audio/Đừng Làm Trái Tim Anh Đau - Sơn Tùng Mtp _ Piano Cover.mp3" },
+    ];
+
+    let currentSongIndex = 0;
+    const audioPlayer = document.getElementById('audioPlayer');
+    const audioSource = document.getElementById('audioSource');
+    const currentSongTitle = document.getElementById('currentSongTitle');
+    const songList = document.getElementById('songList');
+
+    // Tạo danh sách phát
+    function createPlaylist() {
+      songs.forEach((song, index) => {
+        const li = document.createElement('li');
+        li.textContent = song.title;
+        li.onclick = () => playSong(index);
+        songList.appendChild(li);
+      });
+    }
+
+    // Phát bài hát theo index
+    function playSong(index) {
+      currentSongIndex = index;
+      audioSource.src = songs[currentSongIndex].src;
+      audioPlayer.load();
+      audioPlayer.play();
+      updateSongInfo();
+      updatePlaylistUI();
+    }
+
+    // Cập nhật thông tin bài hát
+    function updateSongInfo() {
+      currentSongTitle.textContent = `Now playing: ${songs[currentSongIndex].title}`;
+    }
+
+    // Cập nhật UI danh sách phát
+    function updatePlaylistUI() {
+      const songItems = document.querySelectorAll('#songList li');
+      songItems.forEach((item, index) => {
+        if (index === currentSongIndex) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
+      });
+    }
+
+    // Phát bài hát trước
+    function playPrevSong() {
+      currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+      playSong(currentSongIndex);
+    }
+
+    // Phát bài hát tiếp theo
+    function playNextSong() {
+      currentSongIndex = (currentSongIndex + 1) % songs.length;
+      playSong(currentSongIndex);
+    }
+
+    // Phát bài hát đầu tiên khi tải trang
+    window.onload = () => {
+      createPlaylist();
+      playSong(currentSongIndex);
+    };
+  </script>
+
+</body>
+
+</html>

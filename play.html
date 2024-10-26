@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music Schedule</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f0f0f0;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .player {
+      margin-top: 30px;
+    }
+
+    .song-info {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    .controls {
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 0 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background-color: #ccc;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Music Schedule</h1>
+
+  <div class="schedule-container">
+    <label for="startTime">Start Time:</label>
+    <input type="time" id="startTime" required>
+
+    <label for="endTime">End Time:</label>
+    <input type="time" id="endTime" required>
+
+    <button onclick="addSchedule()">Add Schedule</button>
+  </div>
+
+  <div class="schedule-list">
+    <h2>Schedules:</h2>
+    <ul id="scheduleList"></ul>
+  </div>
+
+  <div class="player">
+    <audio id="audioPlayer" controls>
+      <source id="audioSource" src="" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+
+    <div class="song-info">
+      <p id="currentSongTitle">No song is playing currently.</p>
+    </div>
+  </div>
+
+  <script>
+    const songs = [
+      { title: "Song 1", src: "./assets/audio/(FREE) Lo-fi Type Beat - I Need a Girl.mp3" },
+      { title: "Song 1", src: "./assets/audio/_An Coong Piano Cover_ Đã lỡ yêu em nhiều - JustaTee - Piano Tutorial.mp3" },
+      { title: "Song 1", src: "./assets/audio/Alec Benjamin - Let Me Down Slowly _ Piano Cover by Pianella Piano.mp3" },
+      { title: "Song 1", src: "./assets/audio/Always With Me - Spirited Away (Piano).mp3" },
+      { title: "Song 1", src: "./assets/audio/Beat Ghé Qua - Tofu Dick PC.mp3" },
+      { title: "Song 1", src: "./assets/audio/BINZ   HIT ME UP ft  NOMOVODKA Cover + Sheet Piano - Piano Tutorial.mp3" },
+      { title: "Song 1", src: "./assets/audio/buồn thì cứ khóc đi.mp3" },
+      { title: "Song 1", src: "./assets/audio/Bèo Dạt Mây Trôi - Anh Khang x Quang Thắng _ Piano Cover.mp3" },
+      { title: "Song 1", src: "./assets/audio/Chuyện Đôi Ta - Emcee L (Da LAB) ft Muộii _ Yuriko Piano Cover.mp3" },
+      { title: "Song 1", src: "./assets/audio/CHẠY NGAY ĐI _ RUN NOW _ SƠN TÙNG M-TP __ PIANO COVER #ANCOONG.mp3" },
+      { title: "Song 1", src: "./assets/audio/dhruv - double take _ Piano Cover with Strings (with Lyrics & PIANO SHEET).mp3" },
+      { title: "Song 1", src: "./assets/audio/Ed Sheeran - Shape of You (Piano Cover).mp3" },
+      { title: "Song 1", src: "./assets/audio/Ex's Hate Me part 2 - B Ray & AMEE - Piano Cover + Sheet Piano - Piano Tutorial.mp3" },
+      { title: "Song 1", src: "./assets/audio/HARU HARU(하루하루) Piano - BIGBANG _ Sheet Free.mp3" },
+      { title: "Song 1", src: "./assets/audio/HỒNG NHAN - JACK __ PIANO COVER __ BICH X LE.mp3" },
+      { title: "Song 1", src: "./assets/audio/Jeremy Zucker(제레미 주커) - comethru _ 4hands piano.mp3" },
+      { title: "Song 1", src: "./assets/audio/La La La__ Naughty Boy ft. Sam Smith (Piano Cover).mp3" },
+      { title: "Song 1", src: "./assets/audio/Lindsey Stirling - Senbonzakura (Kurousa Cover).mp3" },
+      { title: "Song 1", src: "./assets/audio/LẠC TRÔI - Sơn Tùng MTP _ Piano Cover Tutorial _ Sheet PDF _ Lê Trangg _.mp3" },
+      { title: "Song 1", src: "./assets/audio/Melanie Martinez - Play Date _ Piano Tutorial & Cover _ Piano Notes.mp3" },
+      { title: "Song 1", src: "./assets/audio/NƠI NÀY CÓ ANH - SƠN TÙNG M-TP __ PIANO COVER __ AN COONG PIANO.mp3" },
+      { title: "Song 1", src: "./assets/audio/Sorry, I Like You.mp3" },
+      { title: "Song 1", src: "./assets/audio/Sparkle - Your Name. (Kimi no Na wa.) OST [Piano] _ RADWIMPS.mp3" },
+      { title: "Song 1", src: "./assets/audio/Spirited Away (2001) - The Name of Life (Instrumental piano) Inochi No Namae いのちの名前.mp3" },
+      { title: "Song 1", src: "./assets/audio/SƠN TÙNG M TP HÃY TRAO CHO ANH ft Snoop Dogg Cover + Sheet Piano Piano Tutorial.mp3" },
+      { title: "Song 1", src: "./assets/audio/SƠN TÙNG M-TP _ CHÚNG TA CỦA HIỆN TẠI _ PIANO COVER  _ AN COONG.mp3" },
+      { title: "Song 1", src: "./assets/audio/Tại Vì Sao_ (Ballad Version) - RPT MCK (Piano).mp3" },
+      { title: "Song 1", src: "./assets/audio/Thiên Lý Ơi - Jack _ Piano Cover.mp3" },
+      { title: "Song 1", src: "./assets/audio/TÌNH ĐẦU QUÁ CHÉN _Anh Trai Say Hi_ _ Piano For Beginner.mp3" },
+      { title: "Song 1", src: "./assets/audio/Túy Âm - Xesi x Masew x Nhatnguyen _ Sheet Free.mp3" },
+      { title: "Song 1", src: "./assets/audio/vài câu nói có khiến người thay đổi (Grey D x tlinh) - Piano cover.mp3" },
+      { title: "Song 1", src: "./assets/audio/Đừng Làm Trái Tim Anh Đau - Sơn Tùng Mtp _ Piano Cover.mp3" },
+    ];
+
+    let currentSongIndex = 0;
+    const audioPlayer = document.getElementById('audioPlayer');
+    const audioSource = document.getElementById('audioSource');
+    const currentSongTitle = document.getElementById('currentSongTitle');
+    const scheduleList = document.getElementById('scheduleList');
+
+    const schedules = []; // Lưu các lịch phát nhạc
+
+    function addSchedule() {
+      const startTime = document.getElementById('startTime').value;
+      const endTime = document.getElementById('endTime').value;
+
+      if (!startTime || !endTime) {
+        alert("Please set both start and end times.");
+        return;
+      }
+
+      schedules.push({ startTime, endTime, hasPlayed: false });
+      updateScheduleList();
+    }
+
+    function updateScheduleList() {
+      scheduleList.innerHTML = '';
+      schedules.forEach((schedule, index) => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `Start: ${schedule.startTime}, End: ${schedule.endTime}`;
+        scheduleList.appendChild(listItem);
+      });
+    }
+
+    function checkSchedule() {
+      const now = new Date();
+      const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+      schedules.forEach(schedule => {
+        if (currentTime === schedule.startTime && !schedule.hasPlayed) {
+          if (audioPlayer.paused) {
+            audioPlayer.play();
+          }
+          schedule.hasPlayed = true; // Đảm bảo chỉ phát 1 lần khi đến giờ
+        }
+
+        if (currentTime === schedule.endTime && schedule.hasPlayed) {
+          audioPlayer.pause();
+          currentSongTitle.textContent = "Playback stopped as per schedule.";
+          schedule.hasPlayed = false; // Reset để có thể phát lại khi đến lịch sau
+        }
+      });
+    }
+
+    function playSong(index) {
+      currentSongIndex = index;
+      audioSource.src = songs[currentSongIndex].src;
+      audioPlayer.load();
+      audioPlayer.play();
+      updateSongInfo();
+    }
+
+    function updateSongInfo() {
+      currentSongTitle.textContent = `Now playing: ${songs[currentSongIndex].title}`;
+    }
+
+    setInterval(checkSchedule, 1000); // Kiểm tra lịch mỗi giây
+
+  </script>
+
+</body>
+
+</html>
