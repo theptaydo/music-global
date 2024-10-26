@@ -6,7 +6,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Music Schedule</title>
   <style>
-    /* ... CSS code as before ... */
+    /* Style cho trang */
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f0f0f0;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .player {
+      margin-top: 30px;
+    }
+
+    .song-info {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    .controls {
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 0 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background-color: #ccc;
+    }
   </style>
 </head>
 
@@ -38,10 +71,18 @@
     <div class="song-info">
       <p id="currentSongTitle">No song is playing currently.</p>
     </div>
+
+    <div class="controls">
+      <button onclick="prevSong()">Prev</button>
+      <button onclick="stopSong()">Stop</button>
+      <button onclick="nextSong()">Next</button>
+    </div>
+
   </div>
 
   <script>
     const songs = [
+      { title: "Song 1", src: "./assets/audio/dhruv - double take _ Piano Cover with Strings (with Lyrics & PIANO SHEET).mp3" },
       { title: "Song 1", src: "./assets/audio/(FREE) Lo-fi Type Beat - I Need a Girl.mp3" },
       { title: "Song 1", src: "./assets/audio/_An Coong Piano Cover_ Đã lỡ yêu em nhiều - JustaTee - Piano Tutorial.mp3" },
       { title: "Song 1", src: "./assets/audio/Alec Benjamin - Let Me Down Slowly _ Piano Cover by Pianella Piano.mp3" },
@@ -52,7 +93,6 @@
       { title: "Song 1", src: "./assets/audio/Bèo Dạt Mây Trôi - Anh Khang x Quang Thắng _ Piano Cover.mp3" },
       { title: "Song 1", src: "./assets/audio/Chuyện Đôi Ta - Emcee L (Da LAB) ft Muộii _ Yuriko Piano Cover.mp3" },
       { title: "Song 1", src: "./assets/audio/CHẠY NGAY ĐI _ RUN NOW _ SƠN TÙNG M-TP __ PIANO COVER #ANCOONG.mp3" },
-      { title: "Song 1", src: "./assets/audio/dhruv - double take _ Piano Cover with Strings (with Lyrics & PIANO SHEET).mp3" },
       { title: "Song 1", src: "./assets/audio/Ed Sheeran - Shape of You (Piano Cover).mp3" },
       { title: "Song 1", src: "./assets/audio/Ex's Hate Me part 2 - B Ray & AMEE - Piano Cover + Sheet Piano - Piano Tutorial.mp3" },
       { title: "Song 1", src: "./assets/audio/HARU HARU(하루하루) Piano - BIGBANG _ Sheet Free.mp3" },
@@ -76,12 +116,15 @@
       { title: "Song 1", src: "./assets/audio/Đừng Làm Trái Tim Anh Đau - Sơn Tùng Mtp _ Piano Cover.mp3" },
     ];
 
+
     let currentSongIndex = 0;
+    let currentSongPosition = 0; // Vị trí hiện tại của bài hát khi tạm dừng
     const audioPlayer = document.getElementById('audioPlayer');
     const audioSource = document.getElementById('audioSource');
     const currentSongTitle = document.getElementById('currentSongTitle');
     const scheduleList = document.getElementById('scheduleList');
-    const schedules = []; // Array to store schedule times
+
+    const schedules = []; // Lưu các lịch phát nhạc
 
     function addSchedule() {
       const startTime = document.getElementById('startTime').value;
@@ -98,7 +141,7 @@
 
     function updateScheduleList() {
       scheduleList.innerHTML = '';
-      schedules.forEach((schedule) => {
+      schedules.forEach((schedule, index) => {
         const listItem = document.createElement('li');
         listItem.textContent = `Start: ${schedule.startTime}, End: ${schedule.endTime}`;
         scheduleList.appendChild(listItem);
@@ -110,23 +153,25 @@
       const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
       schedules.forEach(schedule => {
-        if (currentTime === schedule.startTime && audioPlayer.paused) {
-          audioPlayer.play();
-          schedule.hasPlayed = true; // Only play once within schedule
+        if (currentTime === schedule.startTime && !schedule.hasPlayed) {
+          playSong(currentSongIndex, currentSongPosition); // Chạy tiếp từ vị trí đã lưu
+          schedule.hasPlayed = true; // Đảm bảo chỉ phát 1 lần
         }
 
-        if (currentTime === schedule.endTime && !audioPlayer.paused) {
+        if (currentTime === schedule.endTime && schedule.hasPlayed) {
+          currentSongPosition = audioPlayer.currentTime; // Lưu vị trí khi dừng
           audioPlayer.pause();
           currentSongTitle.textContent = "Playback stopped as per schedule.";
-          schedule.hasPlayed = false;
+          schedule.hasPlayed = false; // Reset để có thể phát lại khi đến lịch sau
         }
       });
     }
 
-    function playSong(index) {
+    function playSong(index, position = 0) {
       currentSongIndex = index;
       audioSource.src = songs[currentSongIndex].src;
       audioPlayer.load();
+      audioPlayer.currentTime = position; // Thiết lập vị trí phát
       audioPlayer.play();
       updateSongInfo();
     }
@@ -135,7 +180,28 @@
       currentSongTitle.textContent = `Now playing: ${songs[currentSongIndex].title}`;
     }
 
-    setInterval(checkSchedule, 1000); // Check every second
+
+    function nextSong() {
+      currentSongIndex = (currentSongIndex + 1) % songs.length; // Di chuyển tới bài hát tiếp theo
+      currentSongPosition = 0; // Đặt lại vị trí phát về 0
+      playSong(currentSongIndex);
+    }
+
+    function prevSong() {
+      currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length; // Di chuyển tới bài hát trước
+      currentSongPosition = 0; // Đặt lại vị trí phát về 0
+      playSong(currentSongIndex);
+    }
+
+    function stopSong() {
+      audioPlayer.pause(); // Tạm dừng phát nhạc
+      currentSongPosition = 0; // Đặt lại vị trí phát về 0
+      currentSongTitle.textContent = "Playback stopped.";
+    }
+
+
+    setInterval(checkSchedule, 1000); // Kiểm tra lịch mỗi giây
+
 
   </script>
 
