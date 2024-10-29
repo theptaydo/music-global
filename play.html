@@ -76,47 +76,15 @@
       <button onclick="prevSong()">Prev</button>
       <button onclick="stopSong()">Stop</button>
       <button onclick="nextSong()">Next</button>
+      <!-- Nút chọn nhạc từ thư mục -->
+      <input type="file" id="folderInput" accept="audio/*" multiple webkitdirectory onchange="loadSongsFromFolder()">
     </div>
 
   </div>
 
   <script>
-    const songs = [
-      { title: "Song 1", src: "./assets/audio/dhruv - double take _ Piano Cover with Strings (with Lyrics & PIANO SHEET).mp3" },
-      { title: "Song 1", src: "./assets/audio/(FREE) Lo-fi Type Beat - I Need a Girl.mp3" },
-      { title: "Song 1", src: "./assets/audio/_An Coong Piano Cover_ Đã lỡ yêu em nhiều - JustaTee - Piano Tutorial.mp3" },
-      { title: "Song 1", src: "./assets/audio/Alec Benjamin - Let Me Down Slowly _ Piano Cover by Pianella Piano.mp3" },
-      { title: "Song 1", src: "./assets/audio/Always With Me - Spirited Away (Piano).mp3" },
-      { title: "Song 1", src: "./assets/audio/Beat Ghé Qua - Tofu Dick PC.mp3" },
-      { title: "Song 1", src: "./assets/audio/BINZ   HIT ME UP ft  NOMOVODKA Cover + Sheet Piano - Piano Tutorial.mp3" },
-      { title: "Song 1", src: "./assets/audio/buồn thì cứ khóc đi.mp3" },
-      { title: "Song 1", src: "./assets/audio/Bèo Dạt Mây Trôi - Anh Khang x Quang Thắng _ Piano Cover.mp3" },
-      { title: "Song 1", src: "./assets/audio/Chuyện Đôi Ta - Emcee L (Da LAB) ft Muộii _ Yuriko Piano Cover.mp3" },
-      { title: "Song 1", src: "./assets/audio/CHẠY NGAY ĐI _ RUN NOW _ SƠN TÙNG M-TP __ PIANO COVER #ANCOONG.mp3" },
-      { title: "Song 1", src: "./assets/audio/Ed Sheeran - Shape of You (Piano Cover).mp3" },
-      { title: "Song 1", src: "./assets/audio/Ex's Hate Me part 2 - B Ray & AMEE - Piano Cover + Sheet Piano - Piano Tutorial.mp3" },
-      { title: "Song 1", src: "./assets/audio/HARU HARU(하루하루) Piano - BIGBANG _ Sheet Free.mp3" },
-      { title: "Song 1", src: "./assets/audio/HỒNG NHAN - JACK __ PIANO COVER __ BICH X LE.mp3" },
-      { title: "Song 1", src: "./assets/audio/Jeremy Zucker(제레미 주커) - comethru _ 4hands piano.mp3" },
-      { title: "Song 1", src: "./assets/audio/La La La__ Naughty Boy ft. Sam Smith (Piano Cover).mp3" },
-      { title: "Song 1", src: "./assets/audio/Lindsey Stirling - Senbonzakura (Kurousa Cover).mp3" },
-      { title: "Song 1", src: "./assets/audio/LẠC TRÔI - Sơn Tùng MTP _ Piano Cover Tutorial _ Sheet PDF _ Lê Trangg _.mp3" },
-      { title: "Song 1", src: "./assets/audio/Melanie Martinez - Play Date _ Piano Tutorial & Cover _ Piano Notes.mp3" },
-      { title: "Song 1", src: "./assets/audio/NƠI NÀY CÓ ANH - SƠN TÙNG M-TP __ PIANO COVER __ AN COONG PIANO.mp3" },
-      { title: "Song 1", src: "./assets/audio/Sorry, I Like You.mp3" },
-      { title: "Song 1", src: "./assets/audio/Sparkle - Your Name. (Kimi no Na wa.) OST [Piano] _ RADWIMPS.mp3" },
-      { title: "Song 1", src: "./assets/audio/Spirited Away (2001) - The Name of Life (Instrumental piano) Inochi No Namae いのちの名前.mp3" },
-      { title: "Song 1", src: "./assets/audio/SƠN TÙNG M TP HÃY TRAO CHO ANH ft Snoop Dogg Cover + Sheet Piano Piano Tutorial.mp3" },
-      { title: "Song 1", src: "./assets/audio/SƠN TÙNG M-TP _ CHÚNG TA CỦA HIỆN TẠI _ PIANO COVER  _ AN COONG.mp3" },
-      { title: "Song 1", src: "./assets/audio/Tại Vì Sao_ (Ballad Version) - RPT MCK (Piano).mp3" },
-      { title: "Song 1", src: "./assets/audio/Thiên Lý Ơi - Jack _ Piano Cover.mp3" },
-      { title: "Song 1", src: "./assets/audio/TÌNH ĐẦU QUÁ CHÉN _Anh Trai Say Hi_ _ Piano For Beginner.mp3" },
-      { title: "Song 1", src: "./assets/audio/Túy Âm - Xesi x Masew x Nhatnguyen _ Sheet Free.mp3" },
-      { title: "Song 1", src: "./assets/audio/vài câu nói có khiến người thay đổi (Grey D x tlinh) - Piano cover.mp3" },
-      { title: "Song 1", src: "./assets/audio/Đừng Làm Trái Tim Anh Đau - Sơn Tùng Mtp _ Piano Cover.mp3" },
-    ];
-
-
+    let songs = [];
+    let selectedSongs = [];
     let currentSongIndex = 0;
     let currentSongPosition = 0; // Vị trí hiện tại của bài hát khi tạm dừng
     const audioPlayer = document.getElementById('audioPlayer');
@@ -125,6 +93,22 @@
     const scheduleList = document.getElementById('scheduleList');
 
     const schedules = []; // Lưu các lịch phát nhạc
+
+
+    function loadSongsFromFolder() {
+      const folderInput = document.getElementById('folderInput');
+      songs = Array.from(folderInput.files).map(file => ({
+        title: file.name,
+        src: URL.createObjectURL(file)
+      }));
+
+      console.log(songs);
+
+      if (songs.length > 0) {
+        currentSongIndex = 0;
+        playSong(currentSongIndex);  // Bắt đầu phát bài đầu tiên trong danh sách
+      }
+    }
 
     function addSchedule() {
       const startTime = document.getElementById('startTime').value;
@@ -138,6 +122,32 @@
       schedules.push({ startTime, endTime, hasPlayed: false });
       updateScheduleList();
     }
+
+    // function loadSelectedFolder() {
+    //   const folderInput = document.getElementById('folderInput');
+    //   selectedSongs = Array.from(folderInput.files).map(file => ({
+    //     title: file.name,
+    //     src: URL.createObjectURL(file)
+    //   }));
+
+    //   if (selectedSongs.length > 0) {
+    //     currentSongIndex = 0;
+    //     playSelectedSong(currentSongIndex);
+    //   }
+    // }
+
+    // function playSelectedSong(index) {
+    //   const song = selectedSongs[index];
+    //   audioSource.src = song.src;
+    //   audioPlayer.load();
+    //   audioPlayer.play();
+    //   currentSongTitle.textContent = `Now playing: ${song.title}`;
+    // }
+
+    // audioPlayer.addEventListener('ended', () => {
+    //   currentSongIndex = (currentSongIndex + 1) % selectedSongs.length;
+    //   playSelectedSong(currentSongIndex);
+    // });
 
     function updateScheduleList() {
       scheduleList.innerHTML = '';
@@ -180,7 +190,6 @@
       currentSongTitle.textContent = `Now playing: ${songs[currentSongIndex].title}`;
     }
 
-
     function nextSong() {
       currentSongIndex = (currentSongIndex + 1) % songs.length; // Di chuyển tới bài hát tiếp theo
       currentSongPosition = 0; // Đặt lại vị trí phát về 0
@@ -201,7 +210,8 @@
 
 
     setInterval(checkSchedule, 1000); // Kiểm tra lịch mỗi giây
-
+    // Thêm sự kiện ended vào audioPlayer
+    audioPlayer.addEventListener('ended', nextSong);
 
   </script>
 
