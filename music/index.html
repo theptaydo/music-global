@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Scheduler</title>
+ 
+</head>
+<style>
+/* Thiết lập cơ bản */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+     
+        color: #121111;
+    }
+    
+    .container {
+        text-align: center;
+        width: 350px;
+        padding: 30px;
+        background-color: rgba(255, 255, 255, 0.1);
+        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+        backdrop-filter: blur(10px);
+    }
+    
+    /* Tiêu đề */
+    h1 {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: #1c1b1b;
+    }
+    
+    /* Thiết kế các trường nhập thời gian */
+    label {
+        display: block;
+        font-size: 14px;
+        margin-top: 10px;
+        color: #161717;
+    }
+    
+    input[type="time"] {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        font-size: 14px;
+        border: 1px solid #4a90e2;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.2);
+        color: #483e3e;
+    }
+    
+    input[type="time"]::placeholder {
+        color: #252323;
+        opacity: 0.8;
+    }
+    
+    /* Nút đặt lịch */
+    button {
+        width: 100%;
+        margin-top: 15px;
+        padding: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        color: #4a90e2;
+        
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s ease;
+    }
+    
+    button:hover {
+        background-color: #4a90e2;
+        color: #fcefef;
+    }
+    
+    /* Thiết kế các nút điều khiển nhạc */
+    .controls {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+    
+    .controls button {
+        width: 30%;
+        padding: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        background-color: #eadbdb;
+        color: #4a90e2;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    
+    .controls button:hover {
+        background-color: #4a90e2;
+        color: #bfbaba;
+    }
+    
+    /* Audio player */
+    audio {
+        margin-top: 20px;
+        width: 100%;
+        outline: none;
+    }
+    
+</style>
+<body>
+    <div class="container">
+        <h1>Music Scheduler</h1>
+        
+        <label for="startTime">Set Start Time:</label>
+        <input type="time" id="startTime" step="1">
+        
+        <label for="endTime">Set End Time:</label>
+        <input type="time" id="endTime" step="1">
+        
+        <label for="musicFiles">Upload Music Files:</label>
+        <input type="file" id="musicFiles" accept="audio/*" multiple onchange="handleFileUpload(event)">
+        <button onclick="scheduleMusic()">Schedule Music</button>
+        
+        <div class="controls">
+            <button onclick="prevSong()">Prev</button>
+            <button onclick="stopMusic()">Stop</button>
+            <button onclick="nextSong()">Next</button>
+        </div>
+        
+        <audio id="audioPlayer" controls></audio>
+    </div>
+
+</body>
+ 
+<script src="index.js"></script>
+</html>
