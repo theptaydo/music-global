@@ -55,6 +55,7 @@
     <input type="time" id="endTime" required>
 
     <button onclick="addSchedule()">Add Schedule</button>
+    <button onclick="setTimeScheduleList()">Set time</button>
   </div>
 
   <div class="schedule-list">
@@ -93,6 +94,7 @@
     const scheduleList = document.getElementById('scheduleList');
 
     const schedules = []; // Lưu các lịch phát nhạc
+
 
 
     function loadSongsFromFolder() {
@@ -208,10 +210,26 @@
       currentSongTitle.textContent = "Playback stopped.";
     }
 
+    function setTimeScheduleList() {
+      const scheduleList = [
+        { startTime: '07:00 AM', endTime: '07:30 AM', hasPlayed: false },
+        { startTime: '07:45 AM', endTime: '12:30 PM', hasPlayed: false },
+        { startTime: '01:00 PM', endTime: '05:00 PM', hasPlayed: false }
+      ];
+
+      for (let i = 0; i < scheduleList.length; i++) {
+        const { startTime, endTime } = scheduleList[i];
+        schedules.push({ startTime, endTime, hasPlayed: false });
+      }
+      // schedules.push({ startTime, endTime, hasPlayed: false });
+      updateScheduleList();
+    }
+
 
     setInterval(checkSchedule, 1000); // Kiểm tra lịch mỗi giây
     // Thêm sự kiện ended vào audioPlayer
     audioPlayer.addEventListener('ended', nextSong);
+    // setTimeScheduleList();
 
   </script>
 
