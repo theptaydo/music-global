@@ -95,8 +95,6 @@
 
     const schedules = []; // Lưu các lịch phát nhạc
 
-
-
     function loadSongsFromFolder() {
       const folderInput = document.getElementById('folderInput');
       songs = Array.from(folderInput.files).map(file => ({
@@ -160,25 +158,6 @@
       });
     }
 
-    function checkSchedule() {
-      const now = new Date();
-      const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-
-      schedules.forEach(schedule => {
-        if (currentTime === schedule.startTime && !schedule.hasPlayed) {
-          playSong(currentSongIndex, currentSongPosition); // Chạy tiếp từ vị trí đã lưu
-          schedule.hasPlayed = true; // Đảm bảo chỉ phát 1 lần
-        }
-
-        if (currentTime === schedule.endTime && schedule.hasPlayed) {
-          currentSongPosition = audioPlayer.currentTime; // Lưu vị trí khi dừng
-          audioPlayer.pause();
-          currentSongTitle.textContent = "Playback stopped as per schedule.";
-          schedule.hasPlayed = false; // Reset để có thể phát lại khi đến lịch sau
-        }
-      });
-    }
-
     function playSong(index, position = 0) {
       currentSongIndex = index;
       audioSource.src = songs[currentSongIndex].src;
@@ -212,9 +191,11 @@
 
     function setTimeScheduleList() {
       const scheduleList = [
-        { startTime: '07:00 AM', endTime: '07:30 AM', hasPlayed: false },
-        { startTime: '07:45 AM', endTime: '12:30 PM', hasPlayed: false },
-        { startTime: '01:00 PM', endTime: '05:00 PM', hasPlayed: false }
+        { startTime: '08:51 AM', endTime: '08:51 AM', hasPlayed: false },
+        { startTime: '08:53 AM', endTime: '08:53 AM', hasPlayed: false },
+        // { startTime: '07:00 AM', endTime: '07:30 AM', hasPlayed: false },
+        // { startTime: '07:45 AM', endTime: '12:30 PM', hasPlayed: false },
+        // { startTime: '01:00 PM', endTime: '05:00 PM', hasPlayed: false }
       ];
 
       for (let i = 0; i < scheduleList.length; i++) {
@@ -225,8 +206,56 @@
       updateScheduleList();
     }
 
+    function checkSchedule() {
+      const now = new Date();
+      const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`; // Định dạng 24 giờ
+      console.log(`current time: ${currentTime} - ${schedules[0]} `)
+      let isWithinAnySchedule = true;
 
-    setInterval(checkSchedule, 1000); // Kiểm tra lịch mỗi giây
+      schedules.forEach(schedule => {
+        const startTime = convertTo24Hour(schedule.startTime);
+        const endTime = convertTo24Hour(schedule.endTime);
+
+        // Kiểm tra nếu thời gian hiện tại nằm trong khoảng
+        if (currentTime >= startTime && currentTime <= endTime) {
+          isWithinAnySchedule = false;
+        }
+      });
+      console.log(isWithinAnySchedule);
+
+      // Dừng nhạc nếu trong khoảng, phát lại nếu không
+      if (isWithinAnySchedule) {
+        if (!audioPlayer.paused) {
+          audioPlayer.pause();
+          currentSongTitle.textContent = "Playback stopped as per schedule.";
+        }
+      } else {
+        if (audioPlayer.paused) {
+          audioPlayer.play();
+          currentSongTitle.textContent = `Now playing: ${songs[currentSongIndex].title}`;
+        }
+      }
+    }
+
+    // Chuyển đổi thời gian từ 12 giờ sang 24 giờ
+    function convertTo24Hour(time) {
+      const [hours, minutes, period] = time.match(/(\d+):(\d+)\s?(AM|PM)/i).slice(1);
+      let hour = parseInt(hours, 10);
+      if (period.toUpperCase() === 'PM' && hour !== 12) {
+        hour += 12;
+      }
+      if (period.toUpperCase() === 'AM' && hour === 12) {
+        hour = 0;
+      }
+      return `${String(hour).padStart(2, '0')}:${minutes}`;
+    }
+
+    // Đặt luồng kiểm tra sau mỗi 2 phút
+    setInterval(checkSchedule, 30 * 1000);
+
+
+
+    // setInterval(checkSchedule, 1000); // Kiểm tra lịch mỗi giây
     // Thêm sự kiện ended vào audioPlayer
     audioPlayer.addEventListener('ended', nextSong);
     // setTimeScheduleList();
