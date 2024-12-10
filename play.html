@@ -191,11 +191,11 @@
 
     function setTimeScheduleList() {
       const scheduleList = [
-        { startTime: '08:51 AM', endTime: '08:51 AM', hasPlayed: false },
-        { startTime: '08:53 AM', endTime: '08:53 AM', hasPlayed: false },
-        // { startTime: '07:00 AM', endTime: '07:30 AM', hasPlayed: false },
-        // { startTime: '07:45 AM', endTime: '12:30 PM', hasPlayed: false },
-        // { startTime: '01:00 PM', endTime: '05:00 PM', hasPlayed: false }
+        // { startTime: '08:51 AM', endTime: '08:51 AM', hasPlayed: false },
+        // { startTime: '08:53 AM', endTime: '08:53 AM', hasPlayed: false },
+        { startTime: '07:00 AM', endTime: '07:30 AM', hasPlayed: false },
+        { startTime: '07:45 AM', endTime: '12:30 PM', hasPlayed: false },
+        { startTime: '01:00 PM', endTime: '05:00 PM', hasPlayed: false }
       ];
 
       for (let i = 0; i < scheduleList.length; i++) {
@@ -250,8 +250,8 @@
       return `${String(hour).padStart(2, '0')}:${minutes}`;
     }
 
-    // Đặt luồng kiểm tra sau mỗi 2 phút
-    setInterval(checkSchedule, 30 * 1000);
+    // Đặt luồng kiểm tra sau mỗi 20s
+    setInterval(checkSchedule, 20 * 1000);
 
 
 
